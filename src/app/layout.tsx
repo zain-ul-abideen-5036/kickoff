@@ -4,6 +4,7 @@ import { themeScript } from '@/lib/theme/script';
 import { fraunces, geist, geistMono } from './fonts';
 import './globals.css';
 import './kickoff.css';
+import './app.css';
 
 export const metadata: Metadata = {
   title: { default: 'Kickoff', template: '%s · Kickoff' },
