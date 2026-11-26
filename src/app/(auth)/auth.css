@@ -12,7 +12,7 @@
   border-right: 1px solid var(--rule);
 }
 .ko .auth-tree {
-  align-items: flex-start;
+  align-self: flex-start;
 }
 .ko .auth-tree .node {
   min-width: 0;
