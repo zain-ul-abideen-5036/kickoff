@@ -1,0 +1,128 @@
+.ko .dash {
+  padding: 28px 32px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.ko .mtr {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+.ko .mtr > div {
+  padding: 18px 24px 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ko .mtr > div + div {
+  padding-left: 24px;
+  border-left: 1px solid var(--rule);
+}
+.ko .mtr-fig {
+  font-size: 40px;
+  line-height: 1.1;
+}
+.ko .filter-search {
+  flex: 1 1 240px;
+  max-width: 360px;
+}
+.ko .filter-search .input {
+  min-height: 40px;
+  padding-left: 40px;
+}
+.ko .filter-select {
+  min-height: 40px;
+  width: auto;
+}
+.ko .kcard-title {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.ko .kcard-title::before {
+  /* the whole card is clickable, the status select stays on top */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.ko .kcard-title:focus-visible {
+  outline: none;
+}
+.ko .kcard:has(.kcard-title:focus-visible) {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.ko .kcard-status {
+  position: relative;
+  z-index: 1;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+.ko .kcard-status .input {
+  min-height: 32px;
+  font-size: 13px;
+  padding: 0 30px 0 8px;
+}
+.ko .kcol-empty {
+  padding: 16px 6px;
+  text-align: center;
+  border: 1px dashed var(--rule-strong);
+  border-radius: 8px;
+}
+.ko .tbl-status {
+  width: 120px;
+  min-height: 32px;
+  font-size: 13px;
+}
+.ko .empty-dash {
+  padding: 56px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+.ko .ghost .node {
+  border-style: dashed;
+  border-color: var(--line);
+  color: var(--ink-2);
+  background: transparent;
+  font-weight: 400;
+}
+@container ko (max-width: 1100px) {
+  .ko .board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container ko (max-width: 900px) {
+  .ko .dash {
+    padding: 16px 16px 40px;
+    gap: 18px;
+  }
+  .ko .mtr {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ko .mtr > div {
+    padding: 14px 0;
+  }
+  .ko .mtr > div + div {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .ko .filter-search {
+    max-width: none;
+  }
+}
+@container ko (max-width: 640px) {
+  .ko .board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
