@@ -16,13 +16,15 @@ const PATHS = {
   upload: 'M12 16V5M7 10l5-5 5 5M5 20h14',
   link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
   send: 'M4 12l16-8-6 16-2.5-6.5z',
-  sitemap: 'M10 3h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM4 16h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM16 16h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM12 8v4M6 16v-4h12v4',
+  sitemap:
+    'M10 3h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM4 16h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM16 16h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM12 8v4M6 16v-4h12v4',
   calendar: 'M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM4 10h16M9 3v4M15 3v4',
   brief: 'M7 3h7l5 5v13H7zM14 3v5h5',
   edit: 'M4 20h4L19 9l-4-4L4 16z',
   lock: 'M7 11h10a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2zM8 11V8a4 4 0 0 1 8 0v3',
   offline: 'M7 18h10a4 4 0 0 0 .8-7.9A6 6 0 0 0 6.3 9.3 4.5 4.5 0 0 0 7 18zM4 4l16 16',
-  settings: 'M4 7h10M18 7h2M4 17h4M12 17h8M16 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM10 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',
+  settings:
+    'M4 7h10M18 7h2M4 17h4M12 17h8M16 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM10 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',
   tag: 'M3 12V4h8l10 10-8 8zM7.5 6.3a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z',
   kanban: 'M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 4v16M15 4v16',
   list: 'M4 6h16M4 12h16M4 18h16',
@@ -86,7 +88,12 @@ export function GripIcon() {
 /** The Kickoff mark: a blueprint corner inside a rounded square. */
 export function KickoffMark({ size = 'md' }: { size?: 'md' | 'lg' }) {
   return (
-    <svg viewBox="0 0 24 24" className={size === 'lg' ? 'ic ic-lg' : 'ic'} aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      className={size === 'lg' ? 'ic ic-lg' : 'ic'}
+      aria-hidden="true"
+      focusable="false"
+    >
       <rect x="3" y="3" width="18" height="18" rx="3" />
       <path d="M8 7.5v9h8.5" />
     </svg>

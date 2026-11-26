@@ -11,9 +11,11 @@ interface Toast {
   action?: { label: string; run: () => void };
 }
 
-const Ctx = createContext<{ show: (text: string, opts?: { tone?: Tone; action?: Toast['action'] }) => void }>({
-  show: () => undefined,
-});
+const Ctx = createContext<{ show: (text: string, opts?: { tone?: Tone; action?: Toast['action'] }) => void }>(
+  {
+    show: () => undefined,
+  },
+);
 
 /** Toasts are announced politely (errors assertively) and dismiss themselves after a few seconds. */
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -49,7 +51,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 {t.action.label}
               </button>
             )}
-            <button type="button" className="btn btn-sm btn-quiet btn-icon" aria-label="Dismiss" onClick={() => dismiss(t.id)}>
+            <button
+              type="button"
+              className="btn btn-sm btn-quiet btn-icon"
+              aria-label="Dismiss"
+              onClick={() => dismiss(t.id)}
+            >
               <Icon name="close" size="sm" />
             </button>
           </div>

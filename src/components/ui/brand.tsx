@@ -28,8 +28,15 @@ export function AgencyMark({
 }) {
   if (logoUrl)
     // A user-uploaded logo of unknown dimensions: next/image would need a fixed size.
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={logoUrl} alt="" width={size} height={size} style={{ objectFit: 'contain', borderRadius: 7 }} />;
+    return (
+      <img
+        src={logoUrl}
+        alt=""
+        width={size}
+        height={size}
+        style={{ objectFit: 'contain', borderRadius: 7 }}
+      />
+    );
   const style = {
     width: size,
     height: size,
@@ -44,7 +51,15 @@ export function AgencyMark({
   );
 }
 
-export function AgencyLockup({ name, color, logoUrl }: { name: string; color: string; logoUrl?: string | null }) {
+export function AgencyLockup({
+  name,
+  color,
+  logoUrl,
+}: {
+  name: string;
+  color: string;
+  logoUrl?: string | null;
+}) {
   return (
     <span className="row" style={{ gap: 10 }}>
       <AgencyMark name={name} color={color} logoUrl={logoUrl} />
