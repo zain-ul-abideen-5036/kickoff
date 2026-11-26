@@ -1,0 +1,40 @@
+.ko .state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+  padding: 64px 32px;
+}
+.ko .ghost-tree .node {
+  border-style: dashed;
+  border-color: var(--line);
+  color: var(--ink-2);
+  background: transparent;
+  font-weight: 400;
+}
+.ko .state-doc {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr) 260px;
+  gap: 32px;
+  padding-top: 32px;
+}
+.ko .state-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.ko .state-page main {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+}
+.ko .state-page main > * {
+  width: min(720px, 100%);
+}
+@container ko (max-width: 900px) {
+  .ko .state-doc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
