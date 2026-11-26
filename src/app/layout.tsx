@@ -6,6 +6,7 @@ import { fraunces, geist, geistMono } from './fonts';
 import './globals.css';
 import './kickoff.css';
 import './app.css';
+import '@/components/states/states.css';
 
 export const metadata: Metadata = {
   title: { default: 'Kickoff', template: '%s · Kickoff' },
