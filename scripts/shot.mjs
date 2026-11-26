@@ -12,6 +12,21 @@ if (!base || !out || targets.length === 0) {
 }
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch();
+
+// Optional sign-in, so workspace pages can be captured: SHOT_EMAIL and SHOT_PASSWORD.
+let storageState;
+if (process.env.SHOT_EMAIL && process.env.SHOT_PASSWORD) {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.goto(`${base}/login`);
+  await page.getByLabel('Email').fill(process.env.SHOT_EMAIL);
+  await page.getByLabel('Password').fill(process.env.SHOT_PASSWORD);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.waitForURL('**/briefs');
+  storageState = await ctx.storageState();
+  await ctx.close();
+}
+
 for (const t of targets) {
   const dark = t.endsWith(':dark');
   const [path, w] = t.replace(/:dark$/, '').split('@');
@@ -19,9 +34,10 @@ for (const t of targets) {
   const ctx = await browser.newContext({
     viewport: { width, height: 900 },
     colorScheme: dark ? 'dark' : 'light',
+    storageState,
   });
   const page = await ctx.newPage();
-  await page.goto(base + path, { waitUntil: 'networkidle' });
+  await page.goto(base + path, { waitUntil: 'load' });
   await page.waitForTimeout(900);
   const name = `${path.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'home'}-${width}${dark ? '-dark' : ''}.png`;
   await page.screenshot({ path: `${out}/${name}`, fullPage: true });

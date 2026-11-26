@@ -1,0 +1,116 @@
+.ko .shell {
+  display: flex;
+  min-height: 100dvh;
+}
+.ko .shell-side {
+  width: 240px;
+  flex: none;
+  border-right: 1px solid var(--rule);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.ko .shell-agency {
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  background: var(--card);
+}
+.ko .nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.ko .nav a:hover {
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.ko .nav a[aria-current='page'] {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--rule);
+  font-weight: 500;
+}
+.ko .shell-intake {
+  margin-top: auto;
+  flex-direction: column;
+  gap: 8px;
+}
+.ko .shell-url {
+  overflow-wrap: anywhere;
+}
+.ko .shell-avatar {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--paper-2);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+.ko .shell-main {
+  flex: 1;
+  min-width: 0;
+}
+.ko .shell-top {
+  display: none;
+}
+.ko .shell-drawer-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+.ko .shell-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  width: 100%;
+  animation: ko-fade var(--t2) var(--ease) both;
+}
+.ko .shell-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(300px, 86vw);
+  background: var(--paper);
+  border-right: 1px solid var(--rule);
+  box-shadow: var(--sh-float);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow-y: auto;
+  animation: ko-in-x var(--t3) var(--ease) both;
+}
+@container ko (max-width: 900px) {
+  .ko .shell {
+    flex-direction: column;
+  }
+  .ko .shell-side {
+    display: none;
+  }
+  .ko .shell-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+}
+@media print {
+  .ko .shell-side {
+    display: none;
+  }
+}
