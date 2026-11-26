@@ -1,0 +1,228 @@
+/* Marketing landing page, ported from the approved canvas design. Scoped under .lp. */
+.ko .lp-nav a.lp-link {
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--ink-2);
+}
+.ko .lp-nav a.lp-link:hover {
+  color: var(--ink);
+}
+.ko .lp-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 56px;
+  align-items: center;
+  padding-top: 72px;
+  padding-bottom: 96px;
+}
+.ko .lp-shot {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  overflow: hidden;
+}
+.ko .lp-shot-l {
+  padding: 22px;
+  border-right: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--paper);
+}
+.ko .lp-shot-r {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ko .mini-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 7px;
+  font-size: 13px;
+  background: var(--card);
+  position: relative;
+}
+.ko .mini-chip .b {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--rule-strong);
+  flex: none;
+}
+.ko .mini-chip.on {
+  border-color: var(--brass);
+  background: var(--brass-tint);
+}
+.ko .mini-chip.on .b,
+.ko .mini-chip .onlay .b {
+  background: var(--brass);
+  border-color: var(--brass);
+}
+.ko .mini-chip .onlay {
+  position: absolute;
+  inset: -1px;
+  border-radius: 7px;
+  border: 1px solid var(--brass);
+  background: var(--brass-tint);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+.ko .lp-pl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+.ko .lp-pl h3 {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.ko .lp-node {
+  min-width: 0;
+  font-size: 12px;
+  padding: 3px 8px;
+}
+.ko .lp-sec {
+  padding-top: 112px;
+  padding-bottom: 112px;
+}
+.ko .lp-sec-h {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 760px;
+  margin-bottom: 56px;
+}
+.ko .lp-mail {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.ko .lp-how {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+  padding: 40px 0;
+  border-top: 1px solid var(--rule);
+  align-items: center;
+}
+.ko .lp-how .num {
+  font-family: var(--serif);
+  font-size: 88px;
+  line-height: 0.9;
+  font-weight: 300;
+  color: var(--brass);
+}
+.ko .lp-anat {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+}
+.ko .lp-call {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ko .lp-rate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+.ko .lp-faq details {
+  border-bottom: 1px solid var(--rule);
+}
+.ko .lp-faq summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 0;
+  font-size: 18px;
+  font-weight: 500;
+  min-height: 44px;
+}
+.ko .lp-faq summary::-webkit-details-marker {
+  display: none;
+}
+.ko .lp-faq summary .ic {
+  transition: transform var(--t2) var(--ease);
+}
+.ko .lp-faq details[open] summary .ic {
+  transform: rotate(45deg);
+}
+.ko .lp-faq details p {
+  padding: 0 0 22px;
+  max-width: 66ch;
+  color: var(--ink-2);
+}
+.ko .lp-band {
+  border-radius: 0;
+}
+@container ko (max-width: 960px) {
+  .ko .lp-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    padding-top: 40px;
+    padding-bottom: 56px;
+  }
+  .ko .lp-how {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 20px;
+  }
+  .ko .lp-how .vis {
+    grid-column: 1 / -1;
+  }
+  .ko .lp-how .num {
+    font-size: 56px;
+  }
+  .ko .lp-anat,
+  .ko .lp-rate {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ko .lp-rate .arrow {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+  .ko .lp-sec {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+  .ko .lp-sec-h {
+    margin-bottom: 36px;
+  }
+}
+@container ko (max-width: 640px) {
+  .ko .lp-shot {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ko .lp-shot-l {
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ko .lp-mail {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .ko .lp-nav .lp-links {
+    display: none;
+  }
+}
