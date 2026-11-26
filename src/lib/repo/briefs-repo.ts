@@ -39,7 +39,10 @@ export function summarise(brief: Brief, vatRate: number): BriefSummary {
     total: quoteTotals(brief.quote, vatRate).total,
     pageCount: brief.pages.length,
     weeks: totalWeeks(brief.phases),
-    scope: a.features.features.includes('shop') && products ? `Shop, ${products} products` : `${brief.pages.length} pages`,
+    scope:
+      a.features.features.includes('shop') && products
+        ? `Shop, ${products} products`
+        : `${brief.pages.length} pages`,
     launch: labelOf(LAUNCHES, a.budget.launch),
     createdAt: brief.createdAt,
     updatedAt: brief.updatedAt,
@@ -75,7 +78,12 @@ async function writeIndex(store: Store, list: BriefSummary[]): Promise<BriefSumm
 }
 
 /** Validates, stamps `updatedAt`, saves the brief and refreshes its row in the index. */
-export async function saveBrief(store: Store, brief: Brief, vatRate: number, now = new Date()): Promise<Brief> {
+export async function saveBrief(
+  store: Store,
+  brief: Brief,
+  vatRate: number,
+  now = new Date(),
+): Promise<Brief> {
   const next = BriefSchema.parse({ ...brief, updatedAt: now.toISOString() });
   await store.putJSON(keyOf(next.id), next);
   const index = (await store.getJSON<BriefSummary[]>(INDEX)) ?? [];
