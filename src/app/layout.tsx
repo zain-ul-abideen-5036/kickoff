@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { ToastProvider } from '@/components/ui/toast';
 import { themeScript } from '@/lib/theme/script';
 import { fraunces, geist, geistMono } from './fonts';
 import './globals.css';
@@ -35,7 +36,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <div className="ko">{children}</div>
+        <div className="ko">
+          <ToastProvider>{children}</ToastProvider>
+        </div>
       </body>
     </html>
   );
