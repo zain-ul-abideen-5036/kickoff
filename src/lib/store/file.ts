@@ -48,7 +48,7 @@ export class FileStore implements Store {
   }
 
   /** Writes to a temp file then renames, so a crash never leaves half a file. */
-  async putBytes(key: string, bytes: Uint8Array): Promise<void> {
+  async putBytes(key: string, bytes: Uint8Array, _contentType?: string): Promise<void> {
     const p = this.path(key);
     await mkdir(dirname(p), { recursive: true });
     const tmp = `${p}.${process.pid}.${Date.now()}.tmp`;
