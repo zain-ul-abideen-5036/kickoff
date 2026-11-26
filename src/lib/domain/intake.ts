@@ -21,7 +21,11 @@ export const AboutSchema = z.object({
   business: text(100).min(1, 'Please add your business name.'),
   businessType: z.enum(ids(BUSINESS_TYPES)),
   location: text(100).min(1, 'Please tell us where you are based.'),
-  email: z.string().trim().max(200).email('That email looks incomplete. Check the ending, for example .co.uk.'),
+  email: z
+    .string()
+    .trim()
+    .max(200)
+    .email('That email looks incomplete. Check the ending, for example .co.uk.'),
   website: z.enum(ids(WEBSITE_STATES)),
 });
 
@@ -40,7 +44,10 @@ export const AudienceSchema = z
     ageMax: z.number().int().min(16).max(90),
     notes: text(600).optional().default(''),
   })
-  .refine((a) => a.ageMin <= a.ageMax, { message: 'The youngest age must be below the oldest.', path: ['ageMin'] });
+  .refine((a) => a.ageMin <= a.ageMax, {
+    message: 'The youngest age must be below the oldest.',
+    path: ['ageMin'],
+  });
 
 export const FeaturesSchema = z.object({
   features: z.array(z.enum(ids(FEATURES))).max(FEATURES.length),
@@ -55,7 +62,10 @@ export const ContentSchema = z.object({
 
 export const InspirationSchema = z.object({
   sites: z.array(text(200)).max(2).default([]),
-  words: z.array(z.enum(ids(STYLE_WORDS))).max(STYLE_WORDS.length).default([]),
+  words: z
+    .array(z.enum(ids(STYLE_WORDS)))
+    .max(STYLE_WORDS.length)
+    .default([]),
   notes: text(600).optional().default(''),
 });
 
