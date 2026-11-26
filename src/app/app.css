@@ -60,3 +60,25 @@
   outline: 2px solid var(--brass);
   outline-offset: 2px;
 }
+
+/* Toast stack, bottom right; full width on phones. */
+.ko .toasts {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(440px, calc(100vw - 32px));
+}
+.ko .toast .btn-quiet {
+  color: var(--paper);
+}
+@container ko (max-width: 640px) {
+  .ko .toasts {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+}
