@@ -1,9 +1,10 @@
+/** Later emails read quieter (muted ink, still 4.5:1), as the thread drags on. */
 const THREAD = [
-  ['Mon 3 Nov', 'Website enquiry', 1],
-  ['Wed 5 Nov', 'Re: what pages would you need?', 0.85],
-  ['Mon 10 Nov', 'Re: Re: rough budget?', 0.7],
-  ['Thu 13 Nov', 'Re: Re: Re: do you have photos?', 0.6],
-  ['Tue 18 Nov', 'Can we just jump on a call?', 0.5],
+  ['Mon 3 Nov', 'Website enquiry', false],
+  ['Wed 5 Nov', 'Re: what pages would you need?', false],
+  ['Mon 10 Nov', 'Re: Re: rough budget?', true],
+  ['Thu 13 Nov', 'Re: Re: Re: do you have photos?', true],
+  ['Tue 18 Nov', 'Can we just jump on a call?', true],
 ] as const;
 
 export function Problem() {
@@ -22,10 +23,10 @@ export function Problem() {
         </div>
         <div style={{ flex: '1 1 0', minWidth: 0 }}>
           <ul aria-label="A typical discovery email thread">
-            {THREAD.map(([date, subject, o]) => (
-              <li key={date} className="lp-mail" style={{ opacity: o }}>
+            {THREAD.map(([date, subject, quiet]) => (
+              <li key={date} className="lp-mail">
                 <span className="mono t-xs muted">{date}</span>
-                <span>{subject}</span>
+                <span className={quiet ? 'muted' : undefined}>{subject}</span>
               </li>
             ))}
           </ul>
