@@ -1,0 +1,116 @@
+.ko .ed-top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-height: 68px;
+  padding: 10px 32px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+.ko .ed-title {
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ko .save-status {
+  gap: 6px;
+}
+.ko .save-ok {
+  color: var(--won-fg);
+}
+.ko .save-err {
+  color: var(--lost-fg);
+}
+.ko .ed {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 280px;
+  gap: 32px;
+  padding: 32px 32px 80px;
+  align-items: start;
+}
+.ko .snav {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ko .snav a {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  min-height: 34px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.ko .snav a:hover {
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.ko .snav a.on {
+  color: var(--ink);
+  background: var(--card);
+  box-shadow: inset 2px 0 0 var(--brass);
+}
+.ko .snav a span {
+  font-family: var(--mono);
+  font-size: 12px;
+  width: 18px;
+}
+.ko .paperdoc {
+  padding: 40px 44px;
+  min-width: 0;
+}
+.ko .rail {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ko .rail-card {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ko .rail-card .btn {
+  justify-content: flex-start;
+}
+@container ko (max-width: 1520px) {
+  .ko .ed {
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+  .ko .snav {
+    display: none;
+  }
+}
+@container ko (max-width: 900px) {
+  .ko .ed {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 16px 16px 64px;
+  }
+  .ko .rail {
+    position: static;
+    order: -1;
+  }
+  .ko .paperdoc {
+    padding: 24px 20px;
+  }
+  .ko .ed-top {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .ko .hide-t {
+    display: none !important;
+  }
+}
