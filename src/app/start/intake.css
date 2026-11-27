@@ -1,0 +1,467 @@
+/* Client intake: welcome, steps with the live brief, assembling and ready pages. */
+
+/* ---------- Welcome ---------- */
+.ko .wl {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  min-height: calc(100dvh - 120px);
+}
+.ko .wl-l {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 36px;
+  padding: 64px 72px 64px max(48px, calc((100% - 1240px) / 2 + 48px));
+}
+.ko .wl-r {
+  position: relative;
+  border-left: 1px solid var(--rule);
+  display: grid;
+  place-items: center;
+  padding: 48px;
+  overflow: hidden;
+}
+.ko .recv li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--rule);
+}
+.ko .cover {
+  position: relative;
+  z-index: 1;
+  width: min(400px, 100%);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: rotate(-1.5deg);
+}
+.ko .cover2 {
+  position: absolute;
+  width: min(360px, 80%);
+  height: 420px;
+  transform: rotate(3deg) translate(40px, 10px);
+  opacity: 0.7;
+}
+.ko .cover .node {
+  min-width: 0;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+.ko .cover .kid {
+  padding: 14px 4px 0;
+}
+.ko .brand-rule {
+  height: 4px;
+}
+@container ko (max-width: 900px) {
+  .ko .wl {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+  .ko .wl-l {
+    padding: 32px 20px 24px;
+    gap: 28px;
+  }
+  .ko .wl-r {
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+    padding: 32px 20px 40px;
+  }
+  .ko .cover2 {
+    display: none;
+  }
+  .ko .cover {
+    transform: none;
+  }
+}
+
+/* ---------- Intake shell ---------- */
+.ko .ishell {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.ko .ihead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 68px;
+}
+.ko .ibody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 72px;
+  align-items: start;
+  padding-top: 40px;
+  padding-bottom: 72px;
+  flex: 1;
+}
+.ko .iform {
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+.ko .iform .q {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ko .iform .q h1:focus {
+  outline: none;
+}
+.ko .ibar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+}
+.ko .save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.ko .mbrief,
+.ko .mprog,
+.ko .pv-close,
+.ko .pv-grip {
+  display: none;
+}
+
+/* ---------- Live preview ---------- */
+.ko .pv {
+  position: sticky;
+  top: 24px;
+  padding: 22px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+.ko .pv-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.ko .pv-sec h3 {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  font-weight: 400;
+}
+.ko .pv-sec.pending {
+  border-top-style: dashed;
+}
+.ko .live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass-line);
+  display: block;
+}
+.ko .pv .tree.outline {
+  align-items: flex-start;
+}
+.ko .pv .outline .kids {
+  flex-direction: column;
+  align-items: stretch;
+  padding-left: 18px;
+}
+.ko .pv .outline .kid {
+  align-items: flex-start;
+  padding: 6px 0 0 20px;
+}
+.ko .pv .outline .kid::before,
+.ko .pv .outline .kid:first-child::before,
+.ko .pv .outline .kid:last-child::before {
+  top: 22px;
+  left: 0;
+  right: auto;
+  width: 16px;
+  display: block;
+}
+.ko .pv .outline .kid::after {
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+.ko .pv .outline .kid:last-child::after {
+  height: 22px;
+}
+.ko .pv .outline > .vstem {
+  margin-left: 18px;
+  height: 10px;
+}
+.ko .pv .node {
+  font-size: 12.5px;
+  padding: 4px 10px 5px;
+  min-width: 0;
+}
+.ko .pv-scrim {
+  display: none;
+}
+
+/* ---------- Review ---------- */
+.ko .rv {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ko .rv-k {
+  padding-top: 3px;
+}
+.ko .consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.ko .consent input {
+  width: 22px;
+  height: 22px;
+  margin: 1px 0 0;
+  accent-color: var(--brass);
+  flex: none;
+}
+.ko .hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ---------- Narrow: drawer and sticky bar ---------- */
+@container ko (max-width: 1023px) {
+  .ko .ibody {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 20px;
+    padding-bottom: 0;
+  }
+  .ko .iform {
+    flex: 1;
+    max-width: none;
+    gap: 24px;
+  }
+  .ko .pv {
+    display: none;
+  }
+  .ko .ishell.dopen .pv {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    max-height: 82dvh;
+    border-radius: 14px 14px 0 0;
+    z-index: 30;
+    animation: ko-up var(--t3) var(--ease) both;
+  }
+  .ko .ishell.dopen .pv-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 29;
+    border: 0;
+    width: 100%;
+  }
+  .ko .pv-close {
+    display: inline-flex;
+  }
+  .ko .pv-grip {
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--rule-strong);
+    margin: -10px auto 0;
+  }
+  .ko .ibar {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    margin: auto -20px 0;
+    padding: 12px 20px 16px;
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .ko .ibar .nxt {
+    flex: 1;
+  }
+  .ko .ibar .save-state {
+    display: none;
+  }
+  .ko .mbrief {
+    display: flex;
+    width: 100%;
+  }
+  .ko .mprog {
+    display: flex;
+  }
+  .ko .dsteps {
+    display: none;
+  }
+  .ko .rv {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ko .rv .rv-k {
+    grid-column: 1 / -1;
+  }
+}
+@container ko (max-width: 640px) {
+  .ko .ihead {
+    min-height: 60px;
+  }
+}
+
+/* ---------- Assembling ---------- */
+.ko .as {
+  position: relative;
+  min-height: calc(100dvh - 64px);
+  display: grid;
+  place-items: center;
+  padding: 48px 20px;
+  overflow: hidden;
+}
+.ko .as-card {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.ko .stg {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px 0;
+  border-top: 1px solid var(--rule);
+}
+.ko .dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule-strong);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.ko .dot.done {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--on-brass);
+}
+.ko .dot.now {
+  border: 1.5px solid var(--brass);
+  color: var(--brass);
+}
+.ko .sketch {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 36px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.ko .sketch .node {
+  min-width: 0;
+}
+@container ko (max-width: 760px) {
+  .ko .as {
+    padding: 24px 16px;
+  }
+  .ko .as-card {
+    padding: 24px 20px;
+  }
+  .ko .sketch {
+    display: none;
+  }
+}
+
+/* ---------- Ready ---------- */
+.ko .hl {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+}
+.ko .hl .node {
+  min-width: 0;
+  padding: 6px 9px 7px;
+  font-size: 13px;
+}
+.ko .hl .kid {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.ko .nx {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--ink);
+}
+.ko .nx li {
+  padding: 20px 24px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+.ko .nx li::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+}
+.ko .nx li.now::before {
+  background: var(--brass);
+  border-color: var(--brass);
+}
+@container ko (max-width: 900px) {
+  .ko .hl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ko .nx {
+    grid-template-columns: minmax(0, 1fr);
+    border-top: 0;
+    border-left: 1px solid var(--ink);
+    margin-left: 4px;
+  }
+  .ko .nx li {
+    padding: 0 0 24px 22px;
+  }
+  .ko .nx li::before {
+    top: 4px;
+    left: -5px;
+  }
+}
