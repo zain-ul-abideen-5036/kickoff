@@ -190,13 +190,13 @@ export function Segmented<T extends string>({
           }
         }}
       >
-        {options.map((o) => (
+        {options.map((o, i) => (
           <button
             key={o.id}
             type="button"
             role="radio"
             aria-checked={value === o.id}
-            tabIndex={value === o.id ? 0 : -1}
+            tabIndex={value === o.id || (i === 0 && !options.some((x) => x.id === value)) ? 0 : -1}
             className={mono ? 'mono' : undefined}
             onClick={() => onChange(o.id)}
           >
