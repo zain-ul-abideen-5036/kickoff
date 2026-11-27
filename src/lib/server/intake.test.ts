@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { EMBER_AND_OAK } from '@/lib/domain/fixtures';
 import { getDraft, saveDraft } from '@/lib/repo/drafts-repo';
 import { MemoryStore } from '@/lib/store/memory';
-import { cleanAnswers, saveDraftInput, startDraft } from './intake';
+import { checkSubmission, cleanAnswers, saveDraftInput, startDraft } from './intake';
 
 describe('drafts', () => {
   it('starts an empty draft with a fresh id', async () => {
@@ -57,6 +57,39 @@ describe('drafts', () => {
     const id = await startDraft(store);
     await saveDraftInput(store, id, { step: 999, answers: {} });
     expect((await getDraft(store, id))?.step).toBe(20);
+  });
+});
+
+describe('checkSubmission', () => {
+  const all = ['about', 'goals', 'audience', 'features', 'content', 'inspiration', 'budget'] as const;
+
+  it('accepts the Ember & Oak answers', () => {
+    expect(checkSubmission(EMBER_AND_OAK, [...all], true)).toMatchObject({ ok: true });
+  });
+
+  it('sends the client back to the first step that needs a look', () => {
+    const a = { ...EMBER_AND_OAK, goals: { goals: [], searchTerm: '' } };
+    expect(checkSubmission(a, [...all], true)).toEqual({
+      ok: false,
+      screen: 'goals',
+      message: 'Choose at least one goal.',
+    });
+  });
+
+  it('asks for unanswered follow-ups only when they are on', () => {
+    const a = { ...EMBER_AND_OAK, followUps: {} };
+    expect(checkSubmission(a, [...all], true)).toMatchObject({ ok: false, screen: 'followups' });
+    expect(checkSubmission(a, [...all], false)).toMatchObject({ ok: true });
+  });
+
+  it('fills steps the studio turned off', () => {
+    const a = {
+      ...EMBER_AND_OAK,
+      goals: { goals: [], searchTerm: '' },
+      audience: { ...EMBER_AND_OAK.audience, groups: [] },
+    };
+    const r = checkSubmission(a, ['about', 'features', 'content', 'budget'], false);
+    expect(r.ok && r.answers.goals.goals).toEqual(['enquiries']);
   });
 });
 
