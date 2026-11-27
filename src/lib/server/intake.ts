@@ -1,4 +1,12 @@
-import { emptyAnswers, type IntakeAnswers } from '@/lib/domain/intake';
+import { fillHiddenSteps } from '@/components/intake/model';
+import {
+  IntakeAnswersSchema,
+  emptyAnswers,
+  stepErrors,
+  type IntakeAnswers,
+  type StepKey,
+} from '@/lib/domain/intake';
+import { selectFollowUps } from '@/lib/engine/followups';
 import { getDraft, saveDraft, type Draft } from '@/lib/repo/drafts-repo';
 import { isId, newId } from '@/lib/repo/ids';
 import type { Store } from '@/lib/store';
@@ -65,4 +73,28 @@ export async function saveDraftInput(
     throw e;
   }
   return { ok: true, updatedAt: next.updatedAt };
+}
+
+export type Submission =
+  { ok: true; answers: IntakeAnswers } | { ok: false; screen: StepKey | 'followups'; message: string };
+
+/**
+ * Checks a finished intake before it becomes a brief: each visible step must be valid, every
+ * follow-up answered (when follow-ups are on), and the whole set must pass the schema once
+ * hidden steps are filled in.
+ */
+export function checkSubmission(answers: IntakeAnswers, steps: StepKey[], followUpsOn: boolean): Submission {
+  for (const step of steps) {
+    const errs = stepErrors(step, answers[step]);
+    const first = Object.values(errs)[0];
+    if (first) return { ok: false, screen: step, message: first };
+  }
+  if (followUpsOn) {
+    const missing = selectFollowUps(answers).questions.find((q) => !answers.followUps[q.id]);
+    if (missing) return { ok: false, screen: 'followups', message: 'Please answer the quick questions.' };
+  }
+  const parsed = IntakeAnswersSchema.safeParse(fillHiddenSteps(answers, steps));
+  if (!parsed.success)
+    return { ok: false, screen: steps[0] ?? 'about', message: 'Some answers need a quick look.' };
+  return { ok: true, answers: parsed.data };
 }

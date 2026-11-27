@@ -1,15 +1,20 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ConfirmResult } from '@/app/start/actions';
 import { Icon } from '@/components/icons';
 import { AgencyMark, PoweredBy } from '@/components/ui/brand';
 import { Button } from '@/components/ui/button';
 import { ProgressBar, Stepper } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/toast';
 import { STEPS, stepErrors, type IntakeAnswers, type StepKey } from '@/lib/domain/intake';
+import { selectFollowUps, type FollowUpSet } from '@/lib/engine/followups';
 import type { SaveResult } from '@/lib/server/intake';
 import { BriefPreview } from './brief-preview';
+import { FollowUpsStep } from './followups-step';
 import { previewModel, screens as screenList, type ScreenKey } from './model';
+import { ReviewStep } from './review-step';
 import { STEP_COPY, StepBody, type Update } from './steps';
 import { readBackup, useAutosave, type SaveState } from './use-autosave';
 
@@ -19,8 +24,14 @@ export interface IntakeAppProps {
   initialStep: number;
   updatedAt: string;
   steps: StepKey[];
+  followUpsOn: boolean;
   agency: { name: string; color: string; logoUrl: string | null };
   save: (id: string, input: { step: number; answers: IntakeAnswers }) => Promise<SaveResult>;
+  getFollowUps: (id: string, answers: IntakeAnswers) => Promise<FollowUpSet | null>;
+  confirm: (
+    id: string,
+    input: { answers: IntakeAnswers; consent: boolean; trap?: string },
+  ) => Promise<ConfirmResult>;
 }
 
 function SaveStatus({ state }: { state: SaveState }) {
@@ -41,15 +52,38 @@ function SaveStatus({ state }: { state: SaveState }) {
   );
 }
 
+/** Keeps rule-chosen questions and options, taking only the polished wording when ids match. */
+function mergeWording(local: FollowUpSet, polished: FollowUpSet | null): FollowUpSet {
+  if (!polished || polished.questions.length !== local.questions.length) return local;
+  if (polished.questions.some((q, i) => q.id !== local.questions[i]!.id)) return local;
+  return {
+    ...local,
+    questions: local.questions.map((q, i) => ({
+      ...q,
+      question: polished.questions[i]!.question,
+      hint: polished.questions[i]!.hint,
+    })),
+  };
+}
+
 /** The guided intake: one question group per screen, with the brief building alongside. */
 export function IntakeApp(props: IntakeAppProps) {
-  const { draftId, steps, agency } = props;
+  const { draftId, steps, agency, followUpsOn, getFollowUps, confirm } = props;
   const toast = useToast();
+  const router = useRouter();
   const [answers, setAnswers] = useState(props.initialAnswers);
-  const [index, setIndex] = useState(Math.min(props.initialStep, steps.length - 1));
-  const [furthest, setFurthest] = useState(Math.min(props.initialStep, steps.length - 1));
+  const startCount = screenList(
+    steps,
+    followUpsOn && selectFollowUps(props.initialAnswers).questions.length > 0,
+  ).length;
+  const [index, setIndex] = useState(Math.min(props.initialStep, startCount - 1));
+  const [furthest, setFurthest] = useState(Math.min(props.initialStep, startCount - 1));
   const [showErrors, setShowErrors] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  const [polished, setPolished] = useState<FollowUpSet | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
 
@@ -58,26 +92,42 @@ export function IntakeApp(props: IntakeAppProps) {
     const b = readBackup(draftId);
     if (b && b.savedAt > Date.parse(props.updatedAt)) {
       setAnswers(b.answers);
-      const i = Math.min(b.step, steps.length - 1);
-      setIndex(i);
-      setFurthest(i);
+      setIndex(b.step);
+      setFurthest(b.step);
     }
-  }, [draftId, props.updatedAt, steps.length]);
+  }, [draftId, props.updatedAt]);
 
-  const all = useMemo(() => screenList(steps, false), [steps]);
-  const screen = all[index] as ScreenKey;
+  const localSet = useMemo(() => (followUpsOn ? selectFollowUps(answers) : null), [followUpsOn, answers]);
+  const followUps = localSet && localSet.questions.length ? mergeWording(localSet, polished) : null;
+  const all = useMemo(() => screenList(steps, !!followUps), [steps, followUps]);
+  const at = Math.min(index, all.length - 1);
+  const screen = all[at] as ScreenKey;
+  const isStep = screen !== 'followups' && screen !== 'review';
   const step = screen as StepKey;
-  const reached = useMemo(() => new Set(all.slice(0, furthest + 1)), [all, furthest]);
+  const reached = useMemo(() => new Set(all.slice(0, Math.max(furthest, at) + 1)), [all, furthest, at]);
   const preview = useMemo(() => previewModel(answers, reached), [answers, reached]);
   const errors = useMemo(
-    () => (showErrors ? stepErrors(step, answers[step]) : {}),
-    [showErrors, step, answers],
+    () => (showErrors && isStep ? stepErrors(step, answers[step]) : {}),
+    [showErrors, isStep, step, answers],
   );
-  const saveState = useAutosave(draftId, index, answers, props.save);
+  const saveState = useAutosave(draftId, at, answers, props.save);
 
   const update: Update = useCallback((section, patch) => {
     setAnswers((a) => ({ ...a, [section]: { ...a[section], ...patch } }));
   }, []);
+
+  // Ask the server for polished follow-up wording when the client reaches that screen.
+  useEffect(() => {
+    if (screen !== 'followups' || polished) return;
+    let live = true;
+    getFollowUps(draftId, answers)
+      .then((set) => live && set && setPolished(set))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+    // Only when arriving at the screen; later answer changes keep the rule-chosen questions.
+  }, [screen]);
 
   useEffect(() => {
     if (!drawer) return;
@@ -89,30 +139,82 @@ export function IntakeApp(props: IntakeAppProps) {
   useEffect(() => {
     if (moved.current) heading.current?.focus();
     moved.current = true;
-  }, [index]);
+  }, [at]);
 
   const go = (i: number) => {
     setShowErrors(false);
+    setFormError('');
     setIndex(i);
     setFurthest((f) => Math.max(f, i));
     window.scrollTo({ top: 0 });
   };
-
-  const next = () => {
-    const errs = stepErrors(step, answers[step]);
-    if (Object.keys(errs).length) {
-      setShowErrors(true);
-      return;
-    }
-    if (index < all.length - 1) go(index + 1);
-    else toast.show('Saved. Review comes next.');
+  const goTo = (key: ScreenKey) => {
+    const i = all.indexOf(key);
+    if (i >= 0) go(i);
   };
 
-  const stepNo = steps.indexOf(step) + 1;
-  const progress = Math.min(1, (index + 1) / (all.length + 1));
+  const submit = async (form: HTMLFormElement) => {
+    setSubmitting(true);
+    setFormError('');
+    try {
+      const trap = String(new FormData(form).get('website_url') ?? '');
+      const r = await confirm(draftId, { answers, consent, trap });
+      if (r.ok) {
+        router.push(`/start/${draftId}/assembling`);
+        return;
+      }
+      setFormError(r.message);
+      if (r.screen && r.screen !== 'review') {
+        goTo(r.screen as ScreenKey);
+        setShowErrors(true);
+      }
+    } catch {
+      setFormError('We couldn’t reach the studio just now. Your answers are saved: please try again.');
+    }
+    setSubmitting(false);
+  };
+
+  const next = (form: HTMLFormElement) => {
+    if (isStep) {
+      if (Object.keys(stepErrors(step, answers[step])).length) {
+        setShowErrors(true);
+        return;
+      }
+    } else if (screen === 'followups') {
+      if (followUps?.questions.some((q) => !answers.followUps[q.id])) {
+        setShowErrors(true);
+        return;
+      }
+    } else {
+      void submit(form);
+      return;
+    }
+    go(at + 1);
+  };
+
+  const stepNo = isStep ? steps.indexOf(step) + 1 : steps.length;
+  const progress = Math.min(1, (at + 1) / (all.length + 1));
   const errorCount = Object.keys(errors).length;
-  const copy = STEP_COPY[step];
-  const stepLabel = STEPS.find((s) => s.key === step)?.label ?? '';
+  const stepLabel = isStep
+    ? (STEPS.find((s) => s.key === step)?.label ?? '')
+    : screen === 'followups'
+      ? 'Final details'
+      : 'Review';
+  const head = isStep
+    ? { eyebrow: `Step ${stepNo} of ${steps.length} · ${stepLabel}`, ...STEP_COPY[step] }
+    : screen === 'followups'
+      ? {
+          eyebrow: `Nearly there · ${followUps?.questions.length === 1 ? '1 quick question' : `${followUps?.questions.length} quick questions`}`,
+          title: 'A couple of quick details so your estimate is accurate',
+          lead: followUps?.reason ?? '',
+        }
+      : {
+          eyebrow: 'Review',
+          title: 'Check your answers',
+          lead: 'Change anything you like before we put your brief together.',
+        };
+  const nextLabel =
+    screen === 'review' ? 'Create my brief' : screen === 'followups' ? 'Review my answers' : 'Continue';
 
   return (
     <div className={drawer ? 'ishell dopen' : 'ishell'}>
@@ -144,13 +246,13 @@ export function IntakeApp(props: IntakeAppProps) {
         <div className="wrap dsteps" style={{ paddingBottom: 18 }}>
           <Stepper
             steps={steps.map((k) => STEPS.find((s) => s.key === k)!.label)}
-            current={Math.min(index, steps.length)}
+            current={isStep ? at : steps.length}
           />
         </div>
         <div className="wrap mprog col" style={{ paddingBottom: 14, gap: 8 }}>
           <div className="row between t-sm">
             <span className="w5">
-              Step {stepNo} of {steps.length} · {stepLabel}
+              {isStep ? `Step ${stepNo} of ${steps.length} · ${stepLabel}` : stepLabel}
             </span>
             <span className="mono muted t-xs">{Math.round(progress * 100)}%</span>
           </div>
@@ -167,34 +269,58 @@ export function IntakeApp(props: IntakeAppProps) {
             noValidate
             onSubmit={(e) => {
               e.preventDefault();
-              next();
+              next(e.currentTarget);
             }}
           >
             <div className="q">
-              <span className="eyebrow">
-                Step {stepNo} of {steps.length} · {stepLabel}
-              </span>
+              <span className={screen === 'followups' ? 'eyebrow brass' : 'eyebrow'}>{head.eyebrow}</span>
               <h1 className="d-2" ref={heading} tabIndex={-1}>
-                {copy.title}
+                {head.title}
               </h1>
-              <p className="muted">{copy.lead}</p>
+              {head.lead && <p className="muted">{head.lead}</p>}
             </div>
-            {errorCount > 0 && (
+            {(errorCount > 0 || formError) && (
               <div className="note note-err" role="alert">
                 <Icon name="alert" />
                 <span>
-                  {errorCount === 1 ? '1 answer needs' : `${errorCount} answers need`} a quick look before you
-                  carry on.
+                  {formError ||
+                    `${errorCount === 1 ? '1 answer needs' : `${errorCount} answers need`} a quick look before you carry on.`}
                 </span>
               </div>
             )}
-            <StepBody
-              step={step}
-              answers={answers}
-              update={update}
-              errors={errors}
-              agencyName={agency.name}
-            />
+            {isStep && (
+              <StepBody
+                step={step}
+                answers={answers}
+                update={update}
+                errors={errors}
+                agencyName={agency.name}
+              />
+            )}
+            {screen === 'followups' && followUps && (
+              <FollowUpsStep
+                set={followUps}
+                values={answers.followUps}
+                showErrors={showErrors}
+                onChange={(id, value) =>
+                  setAnswers((a) => ({ ...a, followUps: { ...a.followUps, [id]: value } }))
+                }
+              />
+            )}
+            {screen === 'review' && (
+              <ReviewStep
+                answers={answers}
+                steps={steps}
+                followUps={followUps}
+                onEdit={goTo}
+                consent={consent}
+                setConsent={(v) => {
+                  setConsent(v);
+                  setFormError('');
+                }}
+                agencyName={agency.name}
+              />
+            )}
             <div className="ibar">
               <Button className="mbrief" icon="brief" aria-expanded={drawer} onClick={() => setDrawer(true)}>
                 Your brief so far
@@ -202,12 +328,19 @@ export function IntakeApp(props: IntakeAppProps) {
                   {preview.readyCount} sections
                 </span>
               </Button>
-              <Button variant="ghost" icon="arrowLeft" disabled={index === 0} onClick={() => go(index - 1)}>
+              <Button variant="ghost" icon="arrowLeft" disabled={at === 0} onClick={() => go(at - 1)}>
                 Back
               </Button>
               <SaveStatus state={saveState} />
-              <Button type="submit" variant="primary" size="lg" className="nxt" iconAfter="arrowRight">
-                Continue
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="nxt"
+                iconAfter="arrowRight"
+                loading={submitting}
+              >
+                {nextLabel}
               </Button>
             </div>
           </form>

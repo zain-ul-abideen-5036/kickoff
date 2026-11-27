@@ -5,7 +5,7 @@ import { getDraft } from '@/lib/repo/drafts-repo';
 import { isId } from '@/lib/repo/ids';
 import { getSettings, logoUrl } from '@/lib/server/context';
 import { getStore } from '@/lib/store';
-import { saveDraftAction } from '../actions';
+import { confirmAction, followUpsAction, saveDraftAction } from '../actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +24,10 @@ export default async function DraftPage({ params }: { params: Promise<{ draft: s
       updatedAt={draft.updatedAt}
       steps={visibleSteps(settings.intake.steps)}
       agency={{ name: settings.agency.name, color: settings.agency.brandColor, logoUrl: logoUrl(settings) }}
+      followUpsOn={settings.intake.followUps}
       save={saveDraftAction}
+      getFollowUps={followUpsAction}
+      confirm={confirmAction}
     />
   );
 }
