@@ -1,0 +1,243 @@
+/* The brief document, shared by the editor and the client's shared view. */
+.ko .doc-head {
+  gap: 14px;
+  padding-bottom: 36px;
+}
+.ko .sec {
+  padding: 40px 0;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scroll-margin-top: 96px;
+}
+.ko .sh {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.ko .sh .n {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--brass);
+  width: 24px;
+  flex: none;
+}
+.ko .goal {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.ko .goal-h {
+  padding-top: 0;
+}
+.ko .aud {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ko .alts {
+  padding: 16px 18px;
+  flex: 0 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ko .platform-name {
+  font-size: 26px;
+}
+.ko .reason-tick {
+  margin-top: 3px;
+}
+.ko .ck {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: center;
+}
+.ko .st-btn {
+  border: 0;
+  cursor: pointer;
+}
+.ko .st-btn:hover {
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.ko .qrow {
+  gap: 14px;
+  padding: 12px 0;
+  align-items: baseline;
+}
+.ko .fcol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--r-lg);
+  background: var(--paper-2);
+  min-height: 140px;
+}
+.ko .fcol.over {
+  box-shadow: inset 0 0 0 1.5px var(--brass-line);
+  background: var(--brass-tint);
+}
+.ko .fcol-empty {
+  padding: 8px 4px;
+}
+.ko .fchip {
+  transition: transform var(--t2) var(--ease);
+}
+.ko .mv-btn {
+  width: 28px;
+  min-height: 28px;
+}
+.ko .rm-btn {
+  width: 28px;
+  min-height: 28px;
+  flex: none;
+  color: var(--ink-2);
+}
+.ko .danger-text {
+  color: var(--lost-fg);
+}
+.ko .nodebar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--card);
+}
+.ko .bp button.node {
+  cursor: pointer;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.ko .bp .node {
+  min-width: 0;
+  padding: 7px 10px 8px;
+  white-space: nowrap;
+}
+.ko .bp .node.sub {
+  white-space: normal;
+  max-width: 120px;
+}
+.ko .tl {
+  grid-template-columns: 190px minmax(0, 1fr);
+}
+.ko .tl-mark b {
+  top: 7px;
+  left: auto;
+  right: 8px;
+}
+.ko .bp .kid {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.ko .tl-row {
+  display: contents;
+}
+.ko .tl-ticks {
+  position: relative;
+  height: 22px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.ko .tl-ticks span {
+  position: absolute;
+  top: 0;
+  height: 22px;
+  padding-left: 4px;
+  border-left: 1px solid var(--rule);
+}
+.ko .wk {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.ko .wk button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rule-strong);
+  background: var(--card);
+  border-radius: 6px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+.ko .wk button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.ko .wk .mono {
+  width: 34px;
+  text-align: center;
+}
+/* Inline editing looks like the document until focused. */
+.ko .inline-edit {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 2px 6px;
+  margin: -3px -7px;
+  resize: none;
+  field-sizing: content;
+  min-width: 4ch;
+}
+.ko .edit-wrap {
+  display: block;
+  min-width: 0;
+}
+.ko span.edit-wrap.mono,
+.ko .row > span.edit-wrap:not(.grow) {
+  display: inline-block;
+}
+.ko .inline-edit:hover {
+  border-color: var(--rule-strong);
+}
+.ko .inline-edit:focus {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+  background: var(--card);
+}
+.ko textarea.inline-edit {
+  line-height: inherit;
+}
+@container ko (max-width: 640px) {
+  .ko .sec {
+    padding: 28px 0;
+  }
+  .ko .goal {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+  .ko .goal .gm {
+    grid-column: 2;
+  }
+  .ko .tl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container ko (min-width: 641px) {
+  .ko .bp .tree > .kids {
+    flex-wrap: nowrap;
+  }
+}
+@media print {
+  .ko .sec {
+    break-inside: avoid;
+  }
+}
