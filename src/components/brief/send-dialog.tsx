@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState } from 'react';
 import { sendToClient } from '@/app/(app)/briefs/[id]/actions';
+import { announceBriefSent } from '@/lib/brief-edit/sent-event';
 import { CopyButton } from '../app/copy-button';
 import { Icon } from '../icons';
 import { Button } from '../ui/button';
@@ -42,6 +43,7 @@ export function SendToClient({
       return;
     }
     setResult(res);
+    announceBriefSent({ id: briefId, fields: res.saved });
     if (res.emailed) toast.show(`Sent to ${clientName} with a private link.`);
   };
 
