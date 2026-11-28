@@ -59,6 +59,36 @@ export function parseRateCardForm(f: Fields): Parsed<RateCard> {
 
 export const OPTIONAL_STEPS = STEPS.filter((s) => s.key !== 'about');
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Recipients typed as a comma, semicolon or line separated list. */
+export function parseRecipients(raw: string | undefined): { emails: string[]; bad: string[] } {
+  const parts = (raw ?? '')
+    .split(/[,;\n]/)
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  const emails = [...new Set(parts.filter((p) => EMAIL.test(p)))];
+  return { emails, bad: parts.filter((p) => !EMAIL.test(p)) };
+}
+
+export function parseNotificationsForm(
+  f: Fields,
+): Parsed<{ notifications: Settings['notifications']; shareDays: number }> {
+  const errors: Record<string, string> = {};
+  const { emails, bad } = parseRecipients(f.recipients);
+  if (bad.length) errors.recipients = `These don’t look like email addresses: ${bad.slice(0, 3).join(', ')}.`;
+  else if (emails.length > 10) errors.recipients = 'Add up to 10 addresses.';
+  const newBrief = f.newBrief === 'on';
+  const approved = f.approved === 'on';
+  if ((newBrief || approved) && emails.length === 0 && !errors.recipients)
+    errors.recipients = 'Add at least one address, or turn the emails off.';
+  const days = Number((f.shareDays ?? '').trim());
+  if (!Number.isInteger(days) || days < 1 || days > 365)
+    errors.shareDays = 'Use a whole number of days from 1 to 365.';
+  if (Object.keys(errors).length) return { ok: false, errors };
+  return { ok: true, value: { notifications: { newBrief, approved, recipients: emails }, shareDays: days } };
+}
+
 export function parseTimelineForm(
   f: Fields,
   current: Settings,
