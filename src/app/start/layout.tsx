@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { BrandAccent } from '@/components/app/brand-accent';
+import { getSettings } from '@/lib/server/context';
 import './intake.css';
 
 export const metadata: Metadata = {
@@ -8,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 /** The client-facing intake. Branding comes from the studio's settings on each page. */
-export default function StartLayout({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+export default async function StartLayout({ children }: { children: ReactNode }) {
+  const settings = await getSettings();
+  return <BrandAccent agency={settings.agency}>{children}</BrandAccent>;
 }
