@@ -15,7 +15,27 @@ import {
   startDraft,
   type SaveResult,
 } from '@/lib/server/intake';
+import { emailConfigFromEnv } from '@/lib/email/send';
+import { appUrl } from '@/lib/server/context';
+import { planStage, readStage, writeStage } from '@/lib/server/intake-brief';
 import { getStore } from '@/lib/store';
+
+export async function readStageAction(id: string) {
+  return readStage(getStore(), id, await loadSettings(getStore()));
+}
+
+export async function planStageAction(id: string) {
+  return planStage(getStore(), id, await loadSettings(getStore()));
+}
+
+export async function writeStageAction(id: string) {
+  const store = getStore();
+  return writeStage(store, id, await loadSettings(store), {
+    ai: aiConfigFromEnv(),
+    email: emailConfigFromEnv(),
+    appUrl: appUrl(),
+  });
+}
 
 /** "Start my brief": creates a draft and opens the first step. */
 export async function startIntake(): Promise<void> {
