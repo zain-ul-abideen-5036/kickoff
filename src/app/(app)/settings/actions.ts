@@ -7,6 +7,7 @@ import { newId } from '@/lib/repo/ids';
 import { loadSettings, saveSettings } from '@/lib/repo/settings-repo';
 import { requireOwner } from '@/lib/server/context';
 import { brandColorCheck, normaliseHex } from '@/lib/settings/contrast';
+import { parseRateCardForm, parseTimelineForm, type Fields } from '@/lib/settings/forms';
 import { checkLogo, isLogoKey } from '@/lib/settings/logo';
 import { getStore } from '@/lib/store';
 
@@ -55,6 +56,34 @@ export async function saveBranding(_prev: SettingsState, form: FormData): Promis
     s.agency.brandColor = color!;
   });
   return { ok: 'Branding saved.' };
+}
+
+/** FormData as plain strings; checkboxes that are off are simply missing. */
+function fields(form: FormData): Fields {
+  const out: Fields = {};
+  for (const [k, v] of form.entries()) if (typeof v === 'string') out[k] = v;
+  return out;
+}
+
+export async function saveRateCard(_prev: SettingsState, form: FormData): Promise<SettingsState> {
+  await requireOwner();
+  const parsed = parseRateCardForm(fields(form));
+  if (!parsed.ok) return { fieldErrors: parsed.errors };
+  await update((s) => {
+    s.rateCard = parsed.value;
+  });
+  return { ok: 'Rate card saved. New briefs use these prices.' };
+}
+
+export async function saveTimeline(_prev: SettingsState, form: FormData): Promise<SettingsState> {
+  await requireOwner();
+  const parsed = parseTimelineForm(fields(form), await loadSettings(getStore()));
+  if (!parsed.ok) return { fieldErrors: parsed.errors };
+  await update((s) => {
+    s.timeline = parsed.value.timeline;
+    s.intake = parsed.value.intake;
+  });
+  return { ok: 'Timeline and intake saved.' };
 }
 
 export async function uploadLogo(_prev: SettingsState, form: FormData): Promise<SettingsState> {
