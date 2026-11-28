@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { getShareLink, saveBriefEdit } from '@/app/(app)/briefs/[id]/actions';
 import { EditError, applyWithActivity, type Edit } from '@/lib/brief-edit/edits';
+import { BRIEF_SENT_EVENT, mergeSent, type BriefSentDetail } from '@/lib/brief-edit/sent-event';
 import type { Brief } from '@/lib/domain/brief';
 import { briefFacts } from '@/lib/engine/generate';
 import { formatGbp, formatWeeks } from '@/lib/format';
@@ -63,6 +64,13 @@ export function useBriefEditor(initial: Brief) {
     },
     [send, toast],
   );
+
+  // Catch up when "Send to client" in the top bar changes the status and share link.
+  useEffect(() => {
+    const onSent = (e: Event) => setBrief((b) => mergeSent(b, (e as CustomEvent<BriefSentDetail>).detail));
+    window.addEventListener(BRIEF_SENT_EVENT, onSent);
+    return () => window.removeEventListener(BRIEF_SENT_EVENT, onSent);
+  }, []);
 
   /** Runs other saves (such as notes) on the same chain, so nothing writes the brief at once. */
   const enqueue = useCallback((task: () => Promise<void>) => {
