@@ -82,3 +82,13 @@
     bottom: 16px;
   }
 }
+
+/* Studio brand colour as the accent on client pages (light theme only; see BrandAccent). */
+:root:not([data-theme='dark']) .ko .brand-accent {
+  --brass: var(--agency-accent);
+  --brass-line: var(--agency-accent);
+  --brass-hover: color-mix(in srgb, var(--agency-accent) 82%, #000);
+  --brass-tint: color-mix(in srgb, var(--agency-accent) 12%, #fffdf8);
+  --brass-wash: color-mix(in srgb, var(--agency-accent) 16%, transparent);
+  --on-brass: #fffdf8;
+}
