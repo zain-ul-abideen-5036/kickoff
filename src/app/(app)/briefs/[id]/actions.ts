@@ -2,7 +2,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { EditError, EditSchema, applyWithActivity } from '@/lib/brief-edit/edits';
+import { NoteError, addNote, removeNote } from '@/lib/brief-edit/notes';
+import type { Brief } from '@/lib/domain/brief';
 import { getBrief, saveBrief } from '@/lib/repo/briefs-repo';
+import { newId } from '@/lib/repo/ids';
 import { ensureShareLink, sharePath } from '@/lib/repo/share-service';
 import { appUrl, getSettings, requireOwner } from '@/lib/server/context';
 import { getStore } from '@/lib/store';
@@ -45,4 +48,33 @@ export async function getShareLink(
   if (!brief) return { ok: false, error: 'That brief no longer exists.' };
   const { token } = await ensureShareLink(store, brief, await getSettings());
   return { ok: true, url: `${appUrl()}${sharePath(token)}` };
+}
+
+export type NoteResult = { ok: true; notes: Brief['notes'] } | { ok: false; error: string };
+
+/** Adds a team-only note. Notes never reach the client. */
+export async function addBriefNote(id: string, text: string): Promise<NoteResult> {
+  const owner = await requireOwner();
+  const store = getStore();
+  const brief = await getBrief(store, id);
+  if (!brief) return { ok: false, error: 'That brief no longer exists.' };
+  const settings = await getSettings();
+  const now = new Date();
+  try {
+    const next = addNote(brief, String(text ?? ''), owner.name, now.toISOString(), newId());
+    const saved = await saveBrief(store, next, settings.rateCard.vatRate, now);
+    return { ok: true, notes: saved.notes };
+  } catch (e) {
+    return { ok: false, error: e instanceof NoteError ? e.message : 'Couldn’t save the note.' };
+  }
+}
+
+export async function removeBriefNote(id: string, noteId: string): Promise<NoteResult> {
+  await requireOwner();
+  const store = getStore();
+  const brief = await getBrief(store, id);
+  if (!brief) return { ok: false, error: 'That brief no longer exists.' };
+  const settings = await getSettings();
+  const saved = await saveBrief(store, removeNote(brief, noteId), settings.rateCard.vatRate);
+  return { ok: true, notes: saved.notes };
 }
