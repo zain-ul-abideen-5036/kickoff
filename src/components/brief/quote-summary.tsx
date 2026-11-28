@@ -48,7 +48,8 @@ export function QuoteSummary({ quote, vatRate, agency }: { quote: Quote; vatRate
             {quote.vat ? 'Includes VAT' : 'Excludes VAT'} · calculated from {agency}&rsquo;s rate card
           </span>
         </span>
-        <span className="fig" aria-label={formatGbp(t.total)}>
+        <span className="fig">
+          <span className="sr-only">{formatGbp(t.total)}</span>
           <span aria-hidden="true">{formatGbp(shown)}</span>
         </span>
       </div>
