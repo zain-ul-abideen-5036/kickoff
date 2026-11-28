@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
-import { removeLogo, saveBranding, uploadLogo, type SettingsState } from '@/app/(app)/settings/actions';
+import { useActionState, useState } from 'react';
+import { removeLogo, saveBranding, uploadLogo } from '@/app/(app)/settings/actions';
 import { Icon } from '../icons';
 import { AgencyMark } from '../ui/brand';
 import { Button } from '../ui/button';
@@ -9,6 +9,7 @@ import { Segmented } from '../ui/choices';
 import { TextField } from '../ui/field';
 import { useToast } from '../ui/toast';
 import { brandColorCheck, normaliseHex } from '@/lib/settings/contrast';
+import { submitKeepingValues, useResultToast } from './use-result-toast';
 
 const SWATCHES = [
   ['#1F3B34', 'Forest'],
@@ -23,18 +24,6 @@ export interface BrandingProps {
   brandColor: string;
   accent: 'brass' | 'brand';
   logoUrl: string | null;
-}
-
-/** Shows a toast once per new action result. */
-function useResultToast(state: SettingsState) {
-  const toast = useToast();
-  const last = useRef<SettingsState | null>(null);
-  useEffect(() => {
-    if (state === last.current) return;
-    last.current = state;
-    if (state.ok) toast.show(state.ok);
-    else if (state.error) toast.show(state.error, { tone: 'error' });
-  }, [state, toast]);
 }
 
 function Pin({ n }: { n: number }) {
@@ -75,7 +64,7 @@ export function BrandingForm(props: BrandingProps) {
           </h2>
           <span className="hint">PNG, JPEG or WebP, up to 256 KB. Shown at 36px high.</span>
         </div>
-        <form action={logoAction} className="set-drop">
+        <form onSubmit={submitKeepingValues(logoAction)} className="set-drop">
           <AgencyMark name={name || 'Studio'} color={color} logoUrl={props.logoUrl} size={56} />
           <div className="col grow" style={{ gap: 6, minWidth: 200 }}>
             <label className="label" htmlFor="logo-file">
@@ -115,7 +104,7 @@ export function BrandingForm(props: BrandingProps) {
         </form>
       </section>
 
-      <form action={action} noValidate>
+      <form onSubmit={submitKeepingValues(action)} noValidate>
         <section className="set-grp" aria-labelledby="colour-h">
           <div className="set-grp-l">
             <h2 className="label" id="colour-h">

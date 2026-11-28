@@ -171,3 +171,7 @@
     min-height: 200px;
   }
 }
+.ko .set-tg .switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
