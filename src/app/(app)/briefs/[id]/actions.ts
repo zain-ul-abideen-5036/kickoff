@@ -81,8 +81,12 @@ export async function removeBriefNote(id: string, noteId: string): Promise<NoteR
   return { ok: true, notes: saved.notes };
 }
 
+/** What changed on the brief when it was sent, so an open editor can catch up without a reload. */
+export type SentFields = Pick<Brief, 'status' | 'share' | 'activity'>;
+
 export type SendResult =
-  { ok: true; url: string; emailed: boolean; to: string; note?: string } | { ok: false; error: string };
+  | { ok: true; url: string; emailed: boolean; to: string; note?: string; saved: SentFields }
+  | { ok: false; error: string };
 
 /**
  * Sends the brief to the client: makes sure a share link exists, emails it when email is set up,
@@ -119,7 +123,14 @@ export async function sendToClient(id: string, message: string): Promise<SendRes
   ];
   const status = brief.status === 'New' || brief.status === 'Reviewed' ? 'Quoted' : brief.status;
   if (status !== brief.status) activity.push({ at: now.toISOString(), text: `Status changed to ${status}` });
-  await saveBrief(store, { ...brief, status, activity }, settings.rateCard.vatRate, now);
+  const saved = await saveBrief(store, { ...brief, status, activity }, settings.rateCard.vatRate, now);
   revalidatePath('/briefs');
-  return { ok: true, url, emailed, to, note };
+  return {
+    ok: true,
+    url,
+    emailed,
+    to,
+    note,
+    saved: { status: saved.status, share: saved.share, activity: saved.activity },
+  };
 }
