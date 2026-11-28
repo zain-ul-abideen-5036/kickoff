@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { getOwner } from '@/lib/auth/owner-repo';
 import { getStore } from '@/lib/store';
 import { SetupForm } from './setup-form';
@@ -8,6 +9,8 @@ export const metadata: Metadata = { title: 'Set up your studio', robots: { index
 
 /** First run only: creates the studio owner. Once an owner exists this page sends you to sign in. */
 export default async function SetupPage() {
+  // Render per request: whether an owner exists changes after the first visit.
+  await connection();
   if (await getOwner(getStore())) redirect('/login');
   return (
     <>
