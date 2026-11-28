@@ -29,7 +29,8 @@ export async function startDraft(store: Store, now = new Date()): Promise<string
 }
 
 export type SaveResult =
-  { ok: true; updatedAt: string } | { ok: false; reason: 'missing' | 'submitted' | 'too-large' | 'invalid' };
+  | { ok: true; updatedAt: string }
+  | { ok: false; reason: 'missing' | 'submitted' | 'too-large' | 'invalid' | 'busy' };
 
 /** Shapes untrusted client input into a draft. Unknown keys are dropped; sizes are capped on save. */
 export function cleanAnswers(raw: unknown): IntakeAnswers {
