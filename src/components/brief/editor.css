@@ -114,3 +114,22 @@
     display: none !important;
   }
 }
+.ko .notes-input {
+  min-height: 84px;
+  font-size: 14px;
+}
+.ko .notes-list {
+  gap: 12px;
+  padding-top: 12px;
+}
+.ko .note-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ko .note-rm {
+  width: 28px;
+  min-height: 28px;
+}
+.ko .activity {
+  padding: 0 4px;
+}

@@ -11,6 +11,7 @@ import { Icon } from '../icons';
 import { Button, ButtonLink } from '../ui/button';
 import { useToast } from '../ui/toast';
 import { BriefDocument, SECTIONS } from './document';
+import { ActivityCard, NotesCard, StatusCard } from './rail';
 
 type SaveState = 'saved' | 'saving' | 'error';
 
@@ -63,7 +64,12 @@ export function useBriefEditor(initial: Brief) {
     [send, toast],
   );
 
-  return { brief, state, apply };
+  /** Runs other saves (such as notes) on the same chain, so nothing writes the brief at once. */
+  const enqueue = useCallback((task: () => Promise<void>) => {
+    chain.current = chain.current.then(task).catch(() => undefined);
+  }, []);
+
+  return { brief, state, apply, enqueue };
 }
 
 export function SaveStatus({ state }: { state: SaveState }) {
@@ -141,7 +147,7 @@ export function BriefEditor({
   /** Extra top-bar actions, such as Send to client. */
   actions?: ReactNode;
 }) {
-  const { brief, state, apply } = useBriefEditor(initial);
+  const { brief, state, apply, enqueue } = useBriefEditor(initial);
   const active = useActiveSection();
   const f = briefFacts(brief, vatRate);
   return (
@@ -206,6 +212,7 @@ export function BriefEditor({
               <span className="mono">{f.pageCount}</span>
             </div>
           </div>
+          <StatusCard brief={brief} apply={apply} />
           {rail?.(brief, apply)}
           <div className="card rail-card">
             <span className="label">Share and export</span>
@@ -220,6 +227,8 @@ export function BriefEditor({
               The CSV imports into Trello or Asana: one task per page, feature and content item.
             </p>
           </div>
+          <NotesCard brief={initial} enqueue={enqueue} />
+          <ActivityCard brief={brief} />
         </aside>
       </div>
     </div>
