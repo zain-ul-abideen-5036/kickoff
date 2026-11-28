@@ -7,7 +7,8 @@ import { startIntake } from './actions';
 export const dynamic = 'force-dynamic';
 
 /** The client's first screen, branded for the studio. */
-export default async function WelcomePage() {
+export default async function WelcomePage({ searchParams }: { searchParams: Promise<{ busy?: string }> }) {
+  const { busy } = await searchParams;
   const settings = await getSettings();
   const { name, brandColor } = settings.agency;
   const logo = logoUrl(settings);
@@ -61,6 +62,14 @@ export default async function WelcomePage() {
               ))}
             </ul>
           </div>
+          {busy && (
+            <div className="note note-err" role="alert" style={{ maxWidth: 520 }}>
+              <Icon name="clock" />
+              <span>
+                Lots of briefs have been started from this connection. Please try again in a little while.
+              </span>
+            </div>
+          )}
           <form
             action={startIntake}
             className="row wrapf a-in-y"
