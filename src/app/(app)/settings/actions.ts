@@ -7,7 +7,17 @@ import { newId } from '@/lib/repo/ids';
 import { loadSettings, saveSettings } from '@/lib/repo/settings-repo';
 import { requireOwner } from '@/lib/server/context';
 import { brandColorCheck, normaliseHex } from '@/lib/settings/contrast';
-import { parseRateCardForm, parseTimelineForm, type Fields } from '@/lib/settings/forms';
+import { cookies, headers } from 'next/headers';
+import { changePassword, checkCredentials } from '@/lib/auth/owner-repo';
+import { passwordProblem } from '@/lib/auth/password';
+import { SESSION_COOKIE, SESSION_DAYS, createSessionToken, sessionSecret } from '@/lib/auth/session';
+import { LIMITS, clientKey, hit } from '@/lib/server/rate-limit';
+import {
+  parseNotificationsForm,
+  parseRateCardForm,
+  parseTimelineForm,
+  type Fields,
+} from '@/lib/settings/forms';
 import { checkLogo, isLogoKey } from '@/lib/settings/logo';
 import { getStore } from '@/lib/store';
 
@@ -84,6 +94,58 @@ export async function saveTimeline(_prev: SettingsState, form: FormData): Promis
     s.intake = parsed.value.intake;
   });
   return { ok: 'Timeline and intake saved.' };
+}
+
+export async function saveAi(_prev: SettingsState, form: FormData): Promise<SettingsState> {
+  await requireOwner();
+  const enabled = form.get('aiEnabled') === 'on';
+  await update((s) => {
+    s.ai.enabled = enabled;
+  });
+  return { ok: enabled ? 'AI is on for new briefs.' : 'AI is off. New briefs are written from templates.' };
+}
+
+export async function saveNotifications(_prev: SettingsState, form: FormData): Promise<SettingsState> {
+  await requireOwner();
+  const parsed = parseNotificationsForm(fields(form));
+  if (!parsed.ok) return { fieldErrors: parsed.errors };
+  await update((s) => {
+    s.notifications = parsed.value.notifications;
+    s.shareDays = parsed.value.shareDays;
+  });
+  return { ok: 'Notifications saved.' };
+}
+
+/** Changes the owner password, signs every other session out, and keeps this one signed in. */
+export async function updatePassword(_prev: SettingsState, form: FormData): Promise<SettingsState> {
+  const owner = await requireOwner();
+  const limit = hit(`password:${clientKey(await headers())}`, LIMITS.login);
+  if (!limit.ok) return { error: 'Too many attempts. Try again later.' };
+  const current = String(form.get('current') ?? '').slice(0, 200);
+  const next = String(form.get('next') ?? '').slice(0, 200);
+  const confirm = String(form.get('confirm') ?? '').slice(0, 200);
+  const fieldErrors: Record<string, string> = {};
+  const store = getStore();
+  if (!(await checkCredentials(store, owner.email, current)))
+    fieldErrors.current = 'That isn’t your current password.';
+  const weak = passwordProblem(next);
+  if (weak) fieldErrors.next = weak;
+  else if (next === current) fieldErrors.next = 'Choose a password you haven’t used here.';
+  if (!fieldErrors.next && confirm !== next) fieldErrors.confirm = 'The two new passwords don’t match.';
+  if (Object.keys(fieldErrors).length) return { fieldErrors };
+  const updated = await changePassword(store, owner, next);
+  (await cookies()).set(
+    SESSION_COOKIE,
+    createSessionToken(updated.email, updated.sessionVersion, sessionSecret()),
+    {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: SESSION_DAYS * 86_400,
+    },
+  );
+  return { ok: 'Password changed. Other devices have been signed out.' };
 }
 
 export async function uploadLogo(_prev: SettingsState, form: FormData): Promise<SettingsState> {
