@@ -6,6 +6,8 @@ import { NoteError, addNote, removeNote } from '@/lib/brief-edit/notes';
 import type { Brief } from '@/lib/domain/brief';
 import { getBrief, saveBrief } from '@/lib/repo/briefs-repo';
 import { newId } from '@/lib/repo/ids';
+import { emailConfigFromEnv, emailEnabled, sendEmail } from '@/lib/email/send';
+import { briefForClientEmail } from '@/lib/email/templates';
 import { ensureShareLink, sharePath } from '@/lib/repo/share-service';
 import { appUrl, getSettings, requireOwner } from '@/lib/server/context';
 import { getStore } from '@/lib/store';
@@ -77,4 +79,47 @@ export async function removeBriefNote(id: string, noteId: string): Promise<NoteR
   const settings = await getSettings();
   const saved = await saveBrief(store, removeNote(brief, noteId), settings.rateCard.vatRate);
   return { ok: true, notes: saved.notes };
+}
+
+export type SendResult =
+  { ok: true; url: string; emailed: boolean; to: string; note?: string } | { ok: false; error: string };
+
+/**
+ * Sends the brief to the client: makes sure a share link exists, emails it when email is set up,
+ * and moves a New or Reviewed brief to Quoted. Without email it still returns the link to share.
+ */
+export async function sendToClient(id: string, message: string): Promise<SendResult> {
+  const owner = await requireOwner();
+  const store = getStore();
+  const found = await getBrief(store, id);
+  if (!found) return { ok: false, error: 'That brief no longer exists.' };
+  const settings = await getSettings();
+  const { brief, token } = await ensureShareLink(store, found, settings);
+  const url = `${appUrl()}${sharePath(token)}`;
+  const to = brief.answers.about.email;
+  const config = emailConfigFromEnv();
+  let emailed = false;
+  let note: string | undefined;
+  if (emailEnabled(config)) {
+    const res = await sendEmail(
+      briefForClientEmail(brief, settings, url, String(message ?? '').slice(0, 1000)),
+      config,
+    );
+    emailed = res.sent;
+    if (!res.sent) note = 'The email didn’t go through. Copy the link and send it yourself.';
+  }
+  const now = new Date();
+  const who = owner.name.split(' ')[0] || 'Owner';
+  const activity = [
+    ...brief.activity,
+    {
+      at: now.toISOString(),
+      text: emailed ? `${who}: Sent the brief to ${to}` : `${who}: Shared the brief link`,
+    },
+  ];
+  const status = brief.status === 'New' || brief.status === 'Reviewed' ? 'Quoted' : brief.status;
+  if (status !== brief.status) activity.push({ at: now.toISOString(), text: `Status changed to ${status}` });
+  await saveBrief(store, { ...brief, status, activity }, settings.rateCard.vatRate, now);
+  revalidatePath('/briefs');
+  return { ok: true, url, emailed, to, note };
 }

@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import '@/components/brief/brief.css';
 import '@/components/brief/editor.css';
 import { BriefEditor } from '@/components/brief/editor';
+import { SendToClient } from '@/components/brief/send-dialog';
+import { emailConfigFromEnv, emailEnabled } from '@/lib/email/send';
 import { getBrief } from '@/lib/repo/briefs-repo';
 import { isId } from '@/lib/repo/ids';
 import { getSettings } from '@/lib/server/context';
@@ -21,5 +23,19 @@ export default async function BriefPage({ params }: Props) {
   const brief = await getBrief(getStore(), id);
   if (!brief) notFound();
   const settings = await getSettings();
-  return <BriefEditor initial={brief} vatRate={settings.rateCard.vatRate} agency={settings.agency.name} />;
+  return (
+    <BriefEditor
+      initial={brief}
+      vatRate={settings.rateCard.vatRate}
+      agency={settings.agency.name}
+      actions={
+        <SendToClient
+          briefId={brief.id}
+          clientName={brief.answers.about.name}
+          clientEmail={brief.answers.about.email}
+          emailOn={emailEnabled(emailConfigFromEnv())}
+        />
+      }
+    />
+  );
 }

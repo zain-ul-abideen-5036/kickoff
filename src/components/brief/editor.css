@@ -133,3 +133,19 @@
 .ko .activity {
   padding: 0 4px;
 }
+.ko .send-dialog {
+  width: min(480px, calc(100vw - 32px));
+  padding: 22px;
+  color: var(--ink);
+  background: var(--card);
+}
+.ko .send-dialog::backdrop {
+  background: rgba(14, 16, 38, 0.42);
+}
+.ko .share-url {
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--paper-2);
+  overflow-wrap: anywhere;
+}
